@@ -1,0 +1,164 @@
+
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "TeduCoreAppAngular7": {
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/TeduCoreAppAngular7",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.app.json",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [             
+              "src/styles.css"  
+            ],
+            "scripts": [
+              "src/assets/vendors/js/vendor.bundle.base.js",
+              "src/assets/vendors/js/vendor.bundle.addons.js",
+              "src/assets/js/misc.js",
+              "src/assets/js/dashboard.js",
+              "node_modules/moment/moment.js",
+              "node_modules/alertifyjs/build/alertify.min.js",
+              "node_modules/tinymce/tinymce.js", 
+              "node_modules/tinymce/themes/modern/theme.js",
+              "node_modules/tinymce/plugins/link/plugin.js",
+              "node_modules/tinymce/plugins/paste/plugin.js",
+              "node_modules/tinymce/plugins/table/plugin.js",
+              "node_modules/tinymce/plugins/autosave/plugin.js",
+              "node_modules/tinymce/plugins/autolink/plugin.js",
+              "node_modules/tinymce/plugins/code/plugin.js",
+              "node_modules/tinymce/plugins/codesample/plugin.js",
+              "node_modules/tinymce/plugins/colorpicker/plugin.js",
+              "node_modules/tinymce/plugins/emoticons/plugin.js",
+              "node_modules/tinymce/plugins/fullscreen/plugin.js",
+              "node_modules/tinymce/plugins/hr/plugin.js",
+              "node_modules/tinymce/plugins/image/plugin.js",
+              "node_modules/tinymce/plugins/imagetools/plugin.js",
+              "node_modules/tinymce/plugins/media/plugin.js",
+              "node_modules/tinymce/plugins/preview/plugin.js",
+              "node_modules/tinymce/plugins/wordcount/plugin.js",
+              "node_modules/tinymce/plugins/textcolor/plugin.js",
+              "node_modules/tinymce/plugins/autoresize/plugin.js"
+                          
+            ]
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "TeduCoreAppAngular7:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "TeduCoreAppAngular7:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "TeduCoreAppAngular7:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "karmaConfig": "src/karma.conf.js",
+            "styles": [
+              "src/styles.css"
+            ],
+            "scripts": [],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "src/tsconfig.app.json",
+              "src/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "TeduCoreAppAngular7-e2e": {
+      "root": "e2e/",
+      "projectType": "application",
+      "prefix": "",
+      "architect": {
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "e2e/protractor.conf.js",
+            "devServerTarget": "TeduCoreAppAngular7:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "TeduCoreAppAngular7:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "e2e/tsconfig.e2e.json",
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "TeduCoreAppAngular7"
+}
