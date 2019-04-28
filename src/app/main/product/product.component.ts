@@ -42,28 +42,17 @@ export class ProductComponent implements OnInit {
   public imageEntityContent: any = {};
   public productImagesContent: any[];
   public imageContent: any = {};
+  public pantners:any=[];
 
-
-  /*Quantity Management*/
-  @ViewChild('quantityManageModal') private quantityManageModal: ModalDirective;
-  public quantityEntity: any = {};
-  public productQuantities: any[];
-  public sizeId: number = null;
-  public colorId: number = null;
-  public sizes: any[];
-  public colors: any[];
-
-  /* WolePriceProduct Management */
-  public wholePriceEntity:any={};
-  public wholePrices:any[];
-  @ViewChild('wholePriceModal') private wholePriceModal:ModalDirective;
 
   constructor(private _utilityService: UtilityService, private _dataService: DataService,
     private _notificationService: NotificationService, private _uploadService: UploadService,public _authenService:AuthenService) { }
 
   ngOnInit() {
     this.search();
+    this.loadPantner();
     this.loadProductCategories();
+    
   }
 
   pageChanged(event: any): void {
@@ -82,6 +71,7 @@ export class ProductComponent implements OnInit {
       }
       );
   }
+  
 
   public searchIndex(){
     this.pageIndex=1;
@@ -98,6 +88,11 @@ export class ProductComponent implements OnInit {
   private loadProductCategories() {
     this._dataService.get('/api/ProductCategory/getallhierachy').subscribe((response: any[]) => {
       this.productCategories = response;
+    });
+  }
+  private loadPantner(){
+    this._dataService.get('/api/Pantner/getall').subscribe((response: any[]) => {
+      this.pantners = response;
     });
   }
 
@@ -125,6 +120,7 @@ export class ProductComponent implements OnInit {
   }
 
   public showAdd() {
+    
     this.entity = { Content: '', Status: true };
     if (this.flagInitTiny) {
       tinymce.on('init', () => {
@@ -152,6 +148,7 @@ export class ProductComponent implements OnInit {
   }
 
   public showEdit(id: string) {
+    
     this._dataService.get('/api/product/detail/' + id).subscribe((response: any) => {
       this.entity = response;
       if (this.flagInitTiny) {
@@ -306,128 +303,6 @@ export class ProductComponent implements OnInit {
     })
   }
 
-
-  /*Quantity management */
-
-  private loadSizes() {
-    this._dataService.get('/api/productQuantity/getsizes').subscribe((res) => {
-      this.sizes = res;
-    });
-  }
-  private loadColors() {
-    this._dataService.get('/api/productQuantity/getcolors').subscribe((res) => {
-      this.colors = res;
-    });
-  }
-
-  private loadProductQuatity(id: any) {
-    this._dataService.get('/api/productQuantity/getall?productId=' + id).subscribe((res) => {
-      this.productQuantities = res;
-    });
-  }
-
-  public showQuantityManage(productId: any) {
-    this.quantityEntity = {
-      ProductId: productId,
-    }
-    this.loadColors();
-    this.loadSizes();
-    this.loadProductQuatity(productId);
-    this.quantityManageModal.show();
-  }
-
-  public saveProductQuantity(forms: NgForm) {
-    this._dataService.post('/api/productQuantity/add', JSON.stringify(this.quantityEntity)).subscribe(res => {
-      if (res != null) {
-        this.loadProductQuatity(this.quantityEntity.ProductId);
-        this.quantityEntity = {
-          ProductId: this.quantityEntity.ProductId,
-        };
-        forms.resetForm();
-      }
-    });
-  }
-
-  public deleteQuantity(productId: any, sizeId: any, colorId: any) {
-    let prama: any = {
-      "productId": productId, "sizeId": sizeId, "colorId": colorId
-    }
-    this._notificationService.printConfirmationDialog(MessageConstant.CONFIRM_DELETE_MEG, () => {
-      this._dataService.deleteWithMultiParams('/api/productQuantity/delete', prama).subscribe((res) => {
-        if (res != null) {
-          this.loadProductQuatity(productId);
-        }
-      });
-    })
-  }
-
-  /* Create API update quatity for product*/
-  public items: any = {}
-
-  public updateQuantity(productId: any, sizeId: number, colorId: number, count: any) {
-    for (let item of this.productQuantities) {
-      if (item.SizeId == sizeId && item.ColorId == colorId) {
-        this.items = item;
-        this.items.Quantity = Number.parseInt(count);
-      };
-    }
-    this._dataService.put('/api/productQuantity/update', JSON.stringify(this.items)).subscribe((res) => {
-    })
-
-  }
-
-  /* WholePricce Product */
-
-  public showWholePriceProduct(id:string){
-    this.loadWholePrice(id);
-    this.wholePriceEntity= {
-      ProductId:id,
-    }
-    this.wholePriceModal.show();
-  }
-
-  private loadWholePrice(id:string){
-    this._dataService.get("/api/wholePrice/getall?productId="+id).subscribe((res)=>{
-      this.wholePrices=res;
-    })
-  }
-
-  public deleteWholePrice(id:string){
-     this._notificationService.printConfirmationDialog(MessageConstant.CONFIRM_DELETE_MEG,()=>{
-       this._dataService.delete("/api/wholePrice/delete","id",id).subscribe(res=>{
-         if(res!=undefined) this.loadWholePrice(this.wholePriceEntity.ProductId);       
-       })
-     })
-  }
-
- public updateWholePrice(id:string,productId:string,fromQuantity:string,toQuantity:string,price:number){
-   
-    let prama={
-        Id:id,
-        ProductId:productId,
-        FromQuantity:fromQuantity,       
-        ToQuantity:toQuantity,
-        Price:price,
-    }
-    this._dataService.put("/api/wholePrice/update",prama).subscribe((res)=>{
-    })
- }
-
-  public saveProductWholePrice(valid:boolean){
-    if(valid){
-      if(this.wholePriceEntity.ToQuantity==null||this.wholePriceEntity.ToQuantity==undefined||this.wholePriceEntity.ToQuantity==""){
-        this.wholePriceEntity.ToQuantity=1000;
-       }
-      this._dataService.post("/api/wholePrice/add",this.wholePriceEntity).subscribe((res=>{
-        if(res!=undefined){
-          this.loadWholePrice(this.wholePriceEntity.ProductId)
-          this.wholePriceEntity.FromQuantity=this.wholePriceEntity.ToQuantity+1;
-          setTimeout(this.wholePriceEntity.ToQuantity="",2000);
-        }
-      }))
-    }
-  }
-
-
+ 
 
 }

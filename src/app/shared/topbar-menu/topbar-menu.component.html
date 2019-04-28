@@ -10,36 +10,7 @@
   <div class="navbar-menu-wrapper d-flex align-items-center">
 
     <ul class="navbar-nav navbar-nav-right">
-      <li class="nav-item dropdown">
-        <a class="nav-link count-indicator dropdown-toggle" id="messageDropdown" href="#" data-toggle="dropdown"
-          aria-expanded="false">
-          <i class="mdi mdi-file-document-box"></i>
-          <span class="count" *ngIf="announcements && announcements.length>0">{{announcements.length}}</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
-          aria-labelledby="messageDropdown">
-          <div class="dropdown-item">
-              <span class="badge badge-info badge-pill float-right">You have {{announcements.length}} unread
-              </span>          
-            </div>
-          <div *ngFor="let item of announcements">
-              <div class="dropdown-divider"></div>
-            <div class="dropdown-divider"></div>
-            <a (click)="markAsRead(item.Id)" class="dropdown-item preview-item">
-              <div class="preview-item-content flex-grow">
-                <h6 class="preview-subject ellipsis font-weight-medium text-dark">{{item.CustomerName}}
-                  <span class="float-right font-weight-light small-text">{{item.DateCreated}}</span>
-                </h6>
-                <p class="font-weight-light small-text">
-                  <span>
-                    ĐT:{{item.CustomerMobile}}                               
-                  </span>
-                </p>
-              </div>
-            </a>
-          </div>
-        </div>
-      </li>
+  
       <li class="nav-item dropdown d-none d-xl-inline-block">
         <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
           <span class="profile-text">{{user.fullName}}</span>

@@ -12,20 +12,13 @@ export const mainRouter:Routes=[
     {path:'product',loadChildren:'./product/product.module#ProductModule'},
     {path:'productcategory',loadChildren:'./product-category/product-category.module#ProductCategoryModule'}, 
     {path:'slide',loadChildren:'./slide/slide.module#SlideModule'}, 
-    {path:'order',loadChildren:'./order/order.module#OrderModule'}, 
-    {path:'order/add',loadChildren:'./order-add/order-add.module#OrderAddModule'}, 
-    {path:'order/detail/:id',loadChildren:'./order-detail/order-detail.module#OrderDetailModule'},  
-    {path:'advertistment',loadChildren:'./advertistment/advertistment.module#AdvertistmentModule'},   
     {path:'contact',loadChildren:'./contact/contact.module#ContactModule'}, 
     {path:'page',loadChildren:'./page/page.module#PageModule'}, 
     {path:'pantner',loadChildren:'./logopantner/logopantner.module#LogopantnerModule'}, 
     {path:'tag',loadChildren:'./tag/tag.module#TagModule'}, 
     {path:'systemconfig',loadChildren:'./system-config/system-config.module#SystemConfigModule'}, 
-    {path:'revenue',loadChildren:'./revenue/revenue.module#RevenueModule'},
-    {path:'sendemail',loadChildren:'./send-email/send-email.module#SendEmailModule'},  
     {path:'changepass',loadChildren:'./changepass/changepass.module#ChangepassModule'},
-    {path:'size',loadChildren:'./size/size.module#SizeModule'},
-    {path:'color',loadChildren:'./color/color.module#ColorModule'},
+    
 ]},
 
 ]

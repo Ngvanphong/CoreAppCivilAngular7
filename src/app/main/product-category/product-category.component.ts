@@ -82,16 +82,8 @@ export class ProductCategoryComponent implements OnInit {
   }
 
   public saveChanges(forms: NgForm) {
-    if (forms.valid) {
-      let fi = this.image.nativeElement;
-      if (fi.files.length > 0) {
-        this._uploadService.postWithFile('/api/upload/saveImage?type=product', null, fi.files).then((imageUrl) => {
-            this.entity.Image = imageUrl;         
-        }).then(()=> this.saveChangesData(forms));
-      }
-      else {
-        this.saveChangesData(forms);
-      }
+    if (forms.valid) {    
+        this.saveChangesData(forms);    
     }
   }
 

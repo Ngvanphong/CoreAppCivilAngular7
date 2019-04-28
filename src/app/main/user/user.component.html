@@ -19,8 +19,7 @@
           <table class="table table-striped">
             <tr>
               <th>Tài khoản</th>
-              <th>Họ tên</th>
-              <th>Tiền dư</th>
+              <th>Họ tên</th>            
               <th>Email</th>
               <th>Ngày sinh</th>
               <th>Số điện thoại</th>
@@ -31,8 +30,7 @@
             <tbody>
               <tr *ngFor="let user of users">
                 <td>{{user.UserName}}</td>
-                <td>{{user.FullName}}</td>
-                <td>{{user.Balance}}</td>
+                <td>{{user.FullName}}</td>               
                 <td>{{user.Email}}</td>
                 <td>{{user.BirthDay | date:'dd/MM/yyyy'}}</td>
                 <td>{{user.PhoneNumber}}</td>
@@ -99,13 +97,7 @@
                 Bạn phải nhập tài khoản
               </small>
             </div>
-          </div>
-          <div class="form-group row">
-            <label class="control-label col-md-2 col-sm-2 col-xs-12">Số dư tài khoản</label>
-            <div class="col-md-10 col-sm-10 col-xs-12">
-              <input type="number" #balance="ngModel" [(ngModel)]="entity.Balance" name="balance" class="form-control">
-            </div>
-          </div>
+          </div>       
           <div class="form-group row" *ngIf="!entity.Id">
             <label class="control-label col-md-2 col-sm-2 col-xs-12">Mật khẩu</label>
             <div class="col-md-10 col-sm-10 col-xs-12">
