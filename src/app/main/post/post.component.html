@@ -20,16 +20,13 @@
             <tr>
               <th>Tên bài viết</th>
               <th>Trang chủ</th>
-              <th>Nổi bậc</th>
               <th>Trạng thái</th>
               <th>Hình ảnh</th>
               <th></th>
             </tr>
             <tbody>
               <tr *ngFor="let item of posts">
-                <td>{{item.Name}}</td>
-                <td>{{item.HomeFlag?"bật":"tắt"}}</td>
-                <td>{{item.HotFlag?"bật":"tắt"}}</td>
+                <td>{{item.Name}}</td>             
                 <td *ngIf="item.Status==0"><i class="fa fa-exclamation-triangle"></i>Bị khóa</td>
                 <td *ngIf="item.Status==1"><i class="fa fa-check-square-o"></i>Kích hoạt</td>
                 <td class="py-1">
@@ -119,21 +116,7 @@
             <div class="col-md-2 col-sm-2 col-xs-12" *ngIf="entity.Image">
               <img [src]="baseFolder + entity.Image" width="90" />
             </div>
-          </div>
-          <div class="form-group row">
-            <label class="control-label col-md-2 col-sm-2 col-xs-12">Trạng thái</label>
-            <div class="col-md-10 col-sm-10 col-xs-12 ">
-              <label class="mr-2" *ngIf="entity.Id">
-                <input type="checkbox" [(ngModel)]="entity.Status" [name]="Status" name="status" [ngModelOptions]="{standalone: true}"> Kích hoạt
-              </label>
-              <label class="mr-2">
-                <input type="checkbox" [(ngModel)]="entity.HomeFlag" [name]="HomeFlag" name="homeFlag" [ngModelOptions]="{standalone: true}">Hiện thị trang chủ
-              </label>
-              <label>
-                <input type="checkbox" [(ngModel)]="entity.HotFlag" [name]="HotFlag" name="hotFlag" [ngModelOptions]="{standalone: true}">Bài viết nổi bật
-              </label>
-            </div>
-          </div>
+          </div>        
           <div class="form-group row">
             <label class="control-label col-md-2 col-sm-2 col-xs-12">Seo title</label>
             <div class="col-md-10 col-sm-10 col-xs-12">

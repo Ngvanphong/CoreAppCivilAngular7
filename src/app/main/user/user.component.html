@@ -76,10 +76,7 @@
       </div>
       <div class="modal-body">
         <form class="form-horizontal form-label-left" novalidate #addEditForm="ngForm" (ngSubmit)="saveChange(addEditForm)"
-          *ngIf="entity">
-          <div class="form-group row">
-            <input disabled class="col-md-12 col-sm-12 col-xs-12" [(ngModel)]="entity.Id" name="id" />
-          </div>
+          *ngIf="entity">         
           <div class="form-group row">
             <label class="control-label col-md-2 col-sm-2 col-xs-12">Họ tên</label>
             <div class="col-md-10 col-sm-10 col-xs-12">
