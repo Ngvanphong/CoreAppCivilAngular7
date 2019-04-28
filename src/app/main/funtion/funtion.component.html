@@ -1,0 +1,181 @@
+<div class="col-md-12 row">
+  <div class="col-md-9 form-group">
+    <h3>Chức năng
+    </h3>
+  </div>
+  <div class="col-md-3 col-sm-6 col-xs-12 form-group ">
+    <input type="text" name="filter" [(ngModel)]="filter" (keyup.enter)="search()" class="form-control" placeholder="Tìm kiếm...">
+  </div>
+</div>
+<div class="form-group">
+  <button class="btn btn-success btn-fw" *ngIf="_authenService.hasPermission('FUNCTION','create')" (click)="showAdd()">Thêm mới</button>
+</div>
+
+<tree-root  #treeFunction [nodes]="_functionHierachy">
+  <ng-template #treeNodeTemplate let-node let-index="index">
+    <span>{{node.data.Name }}  </span>
+    <button class="btn btn-success mr-2" *ngIf="_authenService.hasPermission('FUNCTION','update')" (click)="showPermission(node.data.Id)"><i class="fa fa-lock" aria-hidden="true"></i></button>
+    <button class="btn btn-primary mr-2" *ngIf="_authenService.hasPermission('FUNCTION','update')" (click)="showEdit(node.data.Id)"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
+    <button class="btn btn-danger mr-2" *ngIf="_authenService.hasPermission('FUNCTION','delete')" (click)="delete(node.data.Id)"><i class="fa fa-trash" aria-hidden="true"></i>
+    </button>
+  </ng-template>
+</tree-root>
+
+<!--this is a modal-->
+<div bsModal #addEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Thêm mới / Chỉnh sửa</h4>
+        <button type="button" class="close pull-right" (click)="addEditModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left input_mask" novalidate #addEditForm="ngForm" (ngSubmit)="saveChanges(addEditForm)"
+          *ngIf="entity">
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Mã chức năng</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="hidden" [(ngModel)]="entity.Id" name="id" />
+              <input type="text" #id="ngModel" [disabled]="editFlg" [(ngModel)]="entity.Id" required name="id" class="form-control" />
+              <small [hidden]="id.valid || (id.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập mã chức năng
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Tên chức năng</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #name="ngModel" [(ngModel)]="entity.Name" required minlength="3" name="name" class="form-control" />
+              <small [hidden]="name.valid || (name.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập tên ít nhất 3 ký tự
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Đường dẫn</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #url="ngModel" [(ngModel)]="entity.URL" required name="url" class="form-control" />
+              <small [hidden]="url.valid || (url.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập đường dẫn
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Thứ tự</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="number" #sortOrder="ngModel" [(ngModel)]="entity.SortOrder" required name="sortOrder" class="form-control"/>
+              <small [hidden]="sortOrder.valid || (sortOrder.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập thứ tự
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Chức năng cha</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <select class="form-control" name="parentId" [(ngModel)]="entity.ParentId">
+                <option value="">--Chọn chức năng cha--</option>
+                <option *ngFor="let x of _functions" [value]="x.Id">{{x.Name}}</option>
+              </select>
+              <input type="hidden" [(ngModel)]="entity.ParentId" name="parentId" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Icon CSS</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #iconCss="ngModel" [(ngModel)]="entity.IconCss" name="iconCss" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Trạng thái</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" [(ngModel)]="entity.Status" name="status" #status="ngModel"> Kích hoạt
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="ln_solid"></div>
+          <div class="form-group">
+            <div class="col-md-10 col-sm-10 col-xs-12 col-md-offset-3">
+              <button type="button" (click)="addEditModal.hide()" class="btn btn-danger mr-2">Hủy bỏ</button>
+              <button type="submit" class="btn btn-success" [disabled]="!addEditForm.form.valid">Cập nhật</button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--This is permission popup-->
+<div bsModal #permissionModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Phân quyền cho chức năng</h4>
+        <button type="button" class="close pull-right" (click)="permissionModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left input_mask" novalidate #permissionForm="ngForm" (ngSubmit)="savePermission(permissionForm,_permission)">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>
+                  Tên quyền
+                </th>
+                <th>
+                  Quyền được làm
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let permission of _permission">
+                <td>
+                  {{permission.AppRole.Description}}
+                </td>
+                <td>
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="permission.CanRead" [name]="permission.id" [ngModelOptions]="{standalone: true}"> Xem
+                    </label>
+                  </div>
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="permission.CanCreate" [name]="permission.id" name="status" [ngModelOptions]="{standalone: true}"> Thêm
+                    </label>
+                  </div>
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="permission.CanUpdate" [name]="permission.id" name="status" [ngModelOptions]="{standalone: true}"> Sửa
+                    </label>
+                  </div>
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="permission.CanDelete" [name]="permission.id" name="status" [ngModelOptions]="{standalone: true}"> Xóa
+                    </label>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="ln_solid"></div>
+          <div class="form-group">
+            <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
+              <button type="button" (click)="permissionModal.hide()" class="btn btn-primary mr-2">Hủy bỏ</button>
+              <button type="submit" class="btn btn-success" [disabled]="!permissionForm.form.valid">Cập nhật</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

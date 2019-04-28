@@ -1,0 +1,63 @@
+<div class="col-md-12 row">
+  <div class="col-md-9 form-group">
+    <h3>Đổi mật khẩu
+    </h3>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <form class="form-horizontal form-label-left input_mask" novalidate #addEditForm="ngForm" (ngSubmit)="saveChanges(addEditForm.valid)"
+          *ngIf="entity">
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Tên tài khoản</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #username="ngModel" [(ngModel)]="entity.UserName" required name="username" class="form-control">
+              <small [hidden]="username.valid || (username.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập tài khoản
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Mật khẩu củ</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="password" #oldpassword="ngModel" [(ngModel)]="entity.OldPass" required minlength="6" name="oldpassword"
+                class="form-control">
+              <small [hidden]="oldpassword.valid || (oldpassword.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập tên ít nhất 6 ký tự
+              </small>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Mật khẩu mới</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="password" #newpassword="ngModel" [(ngModel)]="entity.NewPass" required minlength="6" name="newpassword"
+                class="form-control">
+              <small [hidden]="newpassword.valid || (newpassword.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập tên ít nhất 6 ký tự
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Xác nhận mật khẩu</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="password" #confirmpassword="ngModel" [(ngModel)]="entity.Confirmpassword" (keyup)="ConfirmPass()" required
+                validateEqual="newpassword" minlength="6" name="confirmpassword" class="form-control">
+              <small [hidden]="(confirmpassword.valid || (confirmpassword.pristine && !addEditForm.submitted)) && isConfirm==true " class="text-danger">
+                Xác nhận mật khẩu sai
+              </small>
+              
+            </div>
+          </div>
+
+          <div class="ln_solid"></div>
+          <div class="form-group">
+            <button [disabled]="!addEditForm.valid||isConfirm==false" class="btn btn-success btn-fw" type="submit">Cập nhật</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

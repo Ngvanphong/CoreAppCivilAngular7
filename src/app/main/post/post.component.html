@@ -1,0 +1,173 @@
+<div class="col-md-12 row">
+  <div class="col-md-9 form-group">
+    <h3>Bài viết
+    </h3>
+  </div>
+  <div class="col-md-3 col-sm-6 col-xs-12 form-group ">
+    <input type="text" name="filter" [(ngModel)]="filter" (keyup.enter)="searchIndex()" class="form-control" placeholder="Tìm kiếm...">
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="form-group">
+        <button class="btn btn-success btn-fw" *ngIf="_authenService.hasPermission('BLOG','create')" (click)="showAdd()">Thêm
+          mới</button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive" *ngIf="posts && posts.length > 0">
+          <table class="table table-striped">
+            <tr>
+              <th>Tên bài viết</th>
+              <th>Trang chủ</th>
+              <th>Nổi bậc</th>
+              <th>Trạng thái</th>
+              <th>Hình ảnh</th>
+              <th></th>
+            </tr>
+            <tbody>
+              <tr *ngFor="let item of posts">
+                <td>{{item.Name}}</td>
+                <td>{{item.HomeFlag?"bật":"tắt"}}</td>
+                <td>{{item.HotFlag?"bật":"tắt"}}</td>
+                <td *ngIf="item.Status==0"><i class="fa fa-exclamation-triangle"></i>Bị khóa</td>
+                <td *ngIf="item.Status==1"><i class="fa fa-check-square-o"></i>Kích hoạt</td>
+                <td class="py-1">
+                  <img [src]="baseFolder+ item.Image" />
+                </td>
+                <td>
+                  <button data-toggle="tooltip" *ngIf="_authenService.hasPermission('BLOG','update')" data-placement="top" title="Sửa nội dung" class="btn btn-primary mr-2"
+                    (click)="navigateToUpdate(item.Id)">
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                  </button>
+                  <button data-toggle="tooltip" *ngIf="_authenService.hasPermission('BLOG','update')" data-placement="top" title="Sửa thông tin" class="btn btn-success mr-2"
+                    (click)="showEdit(item.Id)">
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                  </button>
+                  <button class="btn btn-danger" *ngIf="_authenService.hasPermission('BLOG','delete')" (click)="delete(item.Id)">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="posts && posts.length == 0" class="col-md-12">
+          <div class="alert alert-info">
+            <strong>Thông báo!</strong> Hiện tại chưa có bài viết nào trong hệ thống
+          </div>
+        </div>
+        <div class="row" *ngIf="posts && posts.length > 0">
+          <div class="col-xs-12 col-12">
+            <pagination [totalItems]="totalRow" [itemsPerPage]="pageSize" [maxSize]="pageDisplay" [(ngModel)]="pageIndex"
+              (pageChanged)="pageChanged($event)"></pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--this is a modal-->
+<div bsModal #addEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Thêm/Sửa bài viết</h4>
+        <button type="button" class="close pull-right" (click)="addEditModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left" novalidate #addEditForm="ngForm" (ngSubmit)="saveChange(addEditForm)"
+          *ngIf="entity">
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Tên bài viết</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #name="ngModel" (keyup)="createAlias(name.value)" [(ngModel)]="entity.Name" required
+                minlength="3" name="name" class="form-control">
+              <small [hidden]="name.valid || (name.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập tên ít nhất 3 ký tự
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Alias</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #seoAlias="ngModel" [(ngModel)]="entity.SeoAlias" required minlength="3" name="seoAlias"
+                class="form-control" />
+              <small [hidden]="seoAlias.valid || (seoAlias.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập alias
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Mô tả bài viết</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <textarea type="text"  #description="ngModel" rows=4 [(ngModel)]="entity.Description" name="description"
+                class="form-control"></textarea>
+            </div>
+          </div>         
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Hình ảnh</label>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <input type="file" #image name="image" class="form-control">
+              <p class="help-block label label-danger"> chỉ hỗ trợ định dạng *.png, *.jpg, *.jpeg </p>
+              <input type="hidden" [(ngModel)]="entity.Image" name="imageUrl" />
+            </div>
+            <div class="col-md-2 col-sm-2 col-xs-12" *ngIf="entity.Image">
+              <img [src]="baseFolder + entity.Image" width="90" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Trạng thái</label>
+            <div class="col-md-10 col-sm-10 col-xs-12 ">
+              <label class="mr-2" *ngIf="entity.Id">
+                <input type="checkbox" [(ngModel)]="entity.Status" [name]="Status" name="status" [ngModelOptions]="{standalone: true}"> Kích hoạt
+              </label>
+              <label class="mr-2">
+                <input type="checkbox" [(ngModel)]="entity.HomeFlag" [name]="HomeFlag" name="homeFlag" [ngModelOptions]="{standalone: true}">Hiện thị trang chủ
+              </label>
+              <label>
+                <input type="checkbox" [(ngModel)]="entity.HotFlag" [name]="HotFlag" name="hotFlag" [ngModelOptions]="{standalone: true}">Bài viết nổi bật
+              </label>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Seo title</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #seoPageTitle="ngModel" [(ngModel)]="entity.SeoPageTitle" name="seoPageTitle" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Từ khóa</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #seoKeywords="ngModel" [(ngModel)]="entity.SeoKeywords" name="keyword" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Mô tả SEO</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <textarea type="text" #seoDescription="ngModel" rows=3 [(ngModel)]="entity.SeoDescription" name="seoDescription"
+                class="form-control"></textarea>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Tags</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #tags="ngModel" [(ngModel)]="entity.Tags" name="tags" class="form-control" />
+            </div>
+          </div>
+          <div class="ln_solid"></div>
+          <div class="form-group row">
+            <div class="col-md-10 col-sm-10 col-xs-12 col-md-offset-3">
+              <button type="submit" class="btn btn-success mr-2" [disabled]="!addEditForm.form.valid">Cập nhật</button>
+              <button type="button" (click)="addEditModal.hide()" class="btn btn-primary">Hủy bỏ</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

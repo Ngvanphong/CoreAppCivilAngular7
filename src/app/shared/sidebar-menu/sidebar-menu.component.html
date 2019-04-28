@@ -1,0 +1,45 @@
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+    <li class="nav-item nav-profile">
+      <div class="nav-link">
+        <div class="user-wrapper">
+          <div class="profile-image">
+            <img [src]="baseFolder+userLogin.avatar">
+          </div>
+          <div class="text-wrapper">
+            <p class="profile-name">{{userLogin.fullName}}</p>
+            <span class="status-indicator online"></span>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+  <ul class="nav" *ngFor="let item of functions">
+
+    <li *ngIf="item.ChildFunctions.length==0" class="nav-item">
+      <a class="nav-link" routerLink="{{item.URL}}" routerLinkActive="active">
+        <i class="fa {{item.IconCss}}"></i>
+        <span class="menu-title">{{item.Name}}</span>
+      </a>
+    </li>
+    <li class="nav-item" *ngIf="item.ChildFunctions.length>0">
+      <a class="nav-link" data-toggle="collapse" href="#{{item.Id}}" aria-expanded="false" aria-controls="auth">
+        <i class="fa {{item.IconCss}}"></i>
+        <span class="menu-title">{{item.Name}}</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="{{item.Id}}">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item" *ngFor="let subItem of item.ChildFunctions">
+            <a class="nav-link" routerLink="{{subItem.URL}}" routerLinkActive="active">
+              <i class="fa {{subItem.IconCss}}"></i>
+              <span class="menu-title">{{subItem.Name}}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </li>
+
+  </ul>
+</nav>

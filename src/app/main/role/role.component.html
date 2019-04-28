@@ -1,0 +1,99 @@
+<div class="col-md-12 row">
+  <div class="col-md-9 form-group">
+    <h3>Quản lý nhóm quyền
+    </h3>
+  </div>
+  <div class="col-md-3 col-sm-6 col-xs-12 form-group ">
+    <input type="text" name="filter" [(ngModel)]="filter" (keyup.enter)="searchIndex()" class="form-control" placeholder="Tìm kiếm...">
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="form-group">
+        <button class="btn btn-success btn-fw" *ngIf="_authenService.hasPermission('ROLE','create')" (click)="showAdd()">Thêm mới</button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive" *ngIf="roles && roles.length > 0">
+          <table class="table table-striped">
+            <tr>
+              <th>Mã</th>
+              <th>Tên</th>
+              <th>#</th>
+            </tr>
+            <tbody>
+              <tr *ngFor="let role of roles">
+                <td>{{role.Name}}</td>
+                <td>{{role.Description}}</td>
+                <td>
+                  <button *ngIf="role.Name!='Admin'&&_authenService.hasPermission('ROLE','update') " class="btn btn-primary mr-2" (click)="editRoleModal(role.Id)">
+                    <i class="fa fa-pencil-square-o"></i>
+                  </button>
+                  <button  *ngIf="role.Name!='Admin'&&_authenService.hasPermission('ROLE','delete')"  class="btn btn-danger" (click)="deleteRole(role.Id)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="roles && roles.length == 0" class="col-md-12">
+          <div class="alert alert-info">
+            <strong>Thông báo!</strong> Hiện tại chưa có quyền nào trong hệ thống
+          </div>
+        </div>        
+        <div class="row" *ngIf="roles && roles.length > 0">
+          <div class="col-xs-12 col-12">
+            <pagination [totalItems]="totalRow" [itemsPerPage]="pageSize" [maxSize]="pageDisplay" [(ngModel)]="pageIndex"
+              (pageChanged)="pageChanged($event)"></pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--this is a modal-->
+<div bsModal #addEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Thêm/Sửa quyền</h4>
+        <button type="button" class="close pull-right" (click)="addEditModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left" #formEditModal="ngForm" name="EditModel" novalidate (ngSubmit)="saveChanged(formEditModal)" *ngIf="entity">
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Tên nhóm</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input class="form-control" type="hidden"  [(ngModel)]="entity.Id" name="id" />
+              <input type="text" class="form-control" required #name="ngModel" [(ngModel)]="entity.Name" name="name" minlength="3" />
+              <small [hidden]="name.valid || (name.pristine && !formEditModal.submitted)" class="text-danger">
+                Bạn phải nhập ít nhất 3 ký tự.
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Mô tả</label>
+            <div class=" col-md-10 col-sm-10 col-xs-12">
+              <textarea class="form-control" required #description="ngModel" [(ngModel)]="entity.Description" name="description"></textarea>
+              <small [hidden]="description.valid || (description.pristine && !formEditModal.submitted)" class="text-danger">
+                
+              </small>
+            </div>
+          </div>
+          <div class="ln_solid"></div>
+          <div class="form-group row">
+            <div class="col-md-10 col-sm-10 col-xs-12 col-md-offset-3">
+              <button type="submit" class="btn btn-success mr-2" (click)="ngSubmit" [disabled]="!formEditModal.valid">Cập nhật</button>
+              <button type="button" class="btn btn-danger" (click)="addEditModal.hide()">Hủy bỏ</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

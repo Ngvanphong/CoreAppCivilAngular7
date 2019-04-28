@@ -1,0 +1,145 @@
+<div class="col-md-12 row">
+  <div class="col-md-9 form-group">
+    <h3>Danh mục sản phẩm
+    </h3>
+  </div>
+  <div class="col-md-3 col-sm-6 col-xs-12 form-group ">
+    <input type="text" name="filter" [(ngModel)]="filter" (keyup.enter)="search()" class="form-control"
+      placeholder="Tìm kiếm...">
+  </div>
+</div>
+<div class="form-group">
+  <button class="btn btn-success btn-fw" *ngIf="_authenService.hasPermission('PRODUCT_CATEGORY','create')" (click)="showAdd()">Thêm mới</button>
+</div>
+
+<tree-root #treeProductCategory [nodes]="_productCategoryHierachy">
+  <ng-template #treeNodeTemplate let-node let-index="index">
+    <span> {{ node.data.Name}}  </span>
+    <button class="btn btn-primary mr-2" *ngIf="_authenService.hasPermission('PRODUCT_CATEGORY','update')" (click)="showEdit(node.data.Id)"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </button>
+    <button class="btn btn-danger" *ngIf="_authenService.hasPermission('PRODUCT_CATEGORY','delete')" (click)="delete(node.data.Id)"><i class="fa fa-trash" aria-hidden="true"></i> </button>
+  </ng-template>
+</tree-root>
+
+  <div bsModal #addEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Thêm mới / Chỉnh sửa</h4>
+        <button type="button" class="close pull-right" (click)="addEditModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left input_mask" novalidate #addEditForm="ngForm" (ngSubmit)="saveChanges(addEditForm)"
+          *ngIf="entity">
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Tên</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="hidden" [(ngModel)]="entity.Id" name="id" />
+              <input type="text" #name="ngModel" (keyup)="createAlias(name.value)" [(ngModel)]="entity.Name" required minlength="3" name="name" class="form-control" />
+              <small [hidden]="name.valid || (name.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập tên ít nhất 3 ký tự
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Alias</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #alias="ngModel" [(ngModel)]="entity.SeoAlias" required minlength="3" name="alias" class="form-control" />
+              <small [hidden]="alias.valid || (alias.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập alias
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Image</label>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <input type="file" #image name="image" class="form-control">
+              <p class="help-block label label-danger"> chỉ hỗ trợ định dạng *.png, *.jpg, *.jpeg </p>
+              <input type="hidden" [(ngModel)]="entity.Image" name="imageUrl" />
+            </div>
+            <div class="col-md-2 col-sm-2 col-xs-12" *ngIf="entity.Image">
+              <img [src]="baseFolder + entity.Image" width="90" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Mô tả</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <textarea type="text"  rows=2 #description="ngModel" [(ngModel)]="entity.Description" name="description" class="form-control"></textarea>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Thứ tự</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="number" #displayOrder="ngModel" [(ngModel)]="entity.SortOrder" required name="displayOrder" class="form-control"/>
+              <small [hidden]="displayOrder.valid || (displayOrder.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập thứ tự
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Thứ tự trang chủ</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="number" #homeOrder="ngModel" [(ngModel)]="entity.HomeOrder" required name="homeOrder" class="form-control" />
+              <small [hidden]="homeOrder.valid || (homeOrder.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập thứ tự hiện thị trang chủ
+              </small>
+            </div>
+          </div>    
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Chức năng cha</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <select class="form-control" name="parentId" [(ngModel)]="entity.ParentId">
+                 <option value="">--Danh mục cha--</option>
+                  <option *ngFor="let x of _productCategories" [value]="x.Id">{{x.Name}}</option>
+                </select>
+              <input type="hidden" [(ngModel)]="entity.ParentId" name="parentId" class="form-control" />
+            </div>
+          </div>         
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Seo title</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #seoPageTitle="ngModel" [(ngModel)]="entity.SeoPageTitle" name="seoPageTitle" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Từ khóa</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #seoKeywords="ngModel" [(ngModel)]="entity.SeoKeywords" name="keyword" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Mô tả SEO</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <textarea type="text" #seoDescription="ngModel" rows=2 [(ngModel)]="entity.SeoDescription" name="seoDescription"
+                class="form-control"></textarea>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Trạng thái</label>
+            <div class="col-md-10 col-sm-10 col-xs-12 row">
+              <div class="checkbox">
+                <label>
+                   <input type="checkbox" [(ngModel)]="entity.Status" name="status" #status="ngModel"> Kích hoạt
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
+                   <input type="checkbox" [(ngModel)]="entity.HomeFlag" name="homeFlag" #status="ngModel"> Hiển thị trang chủ
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="ln_solid"></div>
+          <div class="form-group">
+            <div class="col-md-10 col-sm-10 col-xs-12 col-md-offset-3">
+              <button type="button" (click)="addEditModal.hide()" class="btn btn-danger mr-2">Hủy bỏ</button>
+              <button type="submit" class="btn btn-success" [disabled]="!addEditForm.form.valid">Cập nhật</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

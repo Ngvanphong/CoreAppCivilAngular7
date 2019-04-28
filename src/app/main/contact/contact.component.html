@@ -1,0 +1,84 @@
+<div class="col-md-12 row">
+  <div class="col-md-9 form-group">
+    <h3>Liên hệ
+    </h3>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <form class="form-horizontal form-label-left input_mask" novalidate #addEditForm="ngForm" (ngSubmit)="saveChanges(addEditForm.valid)" *ngIf="entity">
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Tên</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">             
+              <input type="text" #name="ngModel" [(ngModel)]="entity.Name" required minlength="3" name="name" class="form-control" />
+              <small [hidden]="name.valid || (name.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập tên ít nhất 3 ký tự
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Số điện thoại</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #phone="ngModel" [(ngModel)]="entity.Phone" required name="phone" class="form-control" />
+              <small [hidden]="phone.valid || (phone.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập số điện thoại
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Email</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #email="ngModel" pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$" [(ngModel)]="entity.Email"
+                required name="email" class="form-control" />
+              <small [hidden]="email.valid || (email.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập email
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Website</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #website="ngModel" [(ngModel)]="entity.Website" required name="website" class="form-control" />
+              <small [hidden]="website.valid || (website.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập website
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Địa chỉ</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #address="ngModel" [(ngModel)]="entity.Address" required name="address" class="form-control" />
+              <small [hidden]="address.valid || (address.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập tên địa chỉ
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Lat</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="number" #lat="ngModel" [(ngModel)]="entity.Lat" name="lat" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Lng</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="number" #lng="ngModel" [(ngModel)]="entity.Lng" name="lng" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Mục khác</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #other="ngModel" [(ngModel)]="entity.Other" name="other" class="form-control" />
+            </div>
+          </div>
+          <div class="ln_solid"></div>
+          <div class="form-group">
+            <button *ngIf="_authenService.hasPermission('CONTACT','create')||_authenService.hasPermission('CONTACT','update')" [disabled]="!addEditForm.valid" class="btn btn-success btn-fw" type="submit">Cập nhật</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

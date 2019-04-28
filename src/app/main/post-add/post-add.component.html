@@ -1,0 +1,105 @@
+<div class="col-md-12 row">
+  <div class="col-md-9 form-group">
+    <h3>Nội dung bài viết
+    </h3>
+  </div>
+</div>
+<div>
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body col-md-12 col-sm-12 col-xs-12">
+        <app-simple-tiny [elementId]="'my-editor-id'" [content]="this.entity.Content" (onEditorKeyup)="keyupHandlerContentFunction($event)">
+        </app-simple-tiny>
+      </div>
+      <div class="form-group row mlf-30">
+        <button class="btn btn-danger btn-fw mr-2" (click)="goBack()">Quay lại</button>
+        <button class="btn btn-success btn-fw mr-2" (click)="updateContent()">Cập nhật</button>
+        <button class="btn btn-primary mr-2" (click)="showImageManage()">Quản lý ảnh</button>
+        <div class="mt-20">
+          <label class="mr-2">
+            <input type="checkbox" [(ngModel)]="entity.Status"  name="status" [ngModelOptions]="{standalone: true}"><strong>
+              ĐĂNG BÀI VIẾT </strong>
+          </label>
+          <label class="mr-2">
+            <input type="checkbox" [(ngModel)]="entity.HomeFlag"  name="homeFlag" [ngModelOptions]="{standalone: true}"><strong>
+              HIỆN THỊ TRANG CHỦ</strong>
+          </label>
+          <label>
+            <input type="checkbox" [(ngModel)]="entity.HotFlag"  name="hotFlag" [ngModelOptions]="{standalone: true}"><strong>
+              BÀI VIẾT NỔI BẬT</strong>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Quản lý ảnh-->
+<div bsModal #imageManageModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Quản lý ảnh bài viết</h4>
+        <button type="button" class="close pull-right" (click)="closePopupImage()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left input_mask" *ngIf="imageEntity" name="form" novalidate #imageForm="ngForm"
+          (ngSubmit)="savePostImage(imageForm)">
+          <div class="form-group row">
+            <div class="col-md-4 col-xs-3">
+              <label>Chọn ảnh</label>
+              <input type="file" required #imagePath name="imagePath" class="form-control">
+              <p class="help-block label label-danger"> chỉ hỗ trợ định dạng *.png, *.jpg, *.jpeg </p>
+              <input type="hidden" [(ngModel)]="imageEntity.Path" name="imagePath" />
+              <input type="hidden" [(ngModel)]="imageEntity.BlogId" name="blogId" />
+            </div>
+            <div class="col-md-4 col-xs-4 mr-2">
+              <label for="ex2">Mô tả</label>
+              <input class="form-control" name="caption" [(ngModel)]="imageEntity.Caption" type="text">
+            </div>
+            <div class="col-xs-3">
+              <button type="submit" class="btn btn-primary mt-27" [disabled]="!imageForm.valid"> Thêm</button>
+            </div>
+          </div>
+        </form>
+        <table class="table" *ngIf="postImages && postImages.length > 0">
+          <thead>
+            <tr>
+              <th>
+                Hình ảnh
+              </th>            
+              <th>
+                Đường dẫn
+              </th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let image of postImages">
+              <td>
+                <img [src]="baseFolder + image.Path" width="100" />
+              </td>           
+              <td>
+                {{baseFolder+image.Path}}
+              </td>
+              <td>               
+                <button class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Xóa ảnh" (click)="deleteImage(image.Id)">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="postImages && postImages.length == 0" class="col-md-12">
+          <div class="alert alert-info">
+            <strong>Thông báo!</strong> Hiện tại chưa có ảnh nào trong hệ thống
+          </div>
+        </div>
+        <div class="ln_solid"></div>
+      </div>
+    </div>
+  </div>
+</div>

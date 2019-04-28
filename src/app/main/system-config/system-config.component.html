@@ -1,0 +1,124 @@
+<div class="col-md-12 row">
+  <div class="col-md-9 form-group">
+    <h3>Quản lý SystemConfig
+    </h3>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="form-group">
+        <button class="btn btn-success btn-fw" *ngIf="_authenService.hasPermission('SYSTEMCONFIG','create')" (click)="showAdd()">Thêm mới</button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive" *ngIf="systemConfigs && systemConfigs.length > 0">
+          <table class="table table-striped">
+            <tr>
+              <th>Id</th>
+              <th>Tên</th>
+              <th>Value 2</th>
+              <th>Value 3</th>
+              <th>Value 4</th>
+              <th>Value 5</th>
+              <th>Trạng thái</th>
+              <th>#</th>
+            </tr>
+            <tbody>
+              <tr *ngFor="let item of systemConfigs">
+                <td>{{item.Id}}</td>
+                <td>{{item.Name}}</td>
+                <td>{{item.Value2}}</td>
+                <td>{{item.Value3}}</td>
+                <td>{{item.Value4}}</td>
+                <td>{{item.Value5}}</td>
+                <td *ngIf="item.Status==0"><i class="fa fa-exclamation-triangle"></i>Bị khóa</td>
+                <td *ngIf="item.Status==1"><i class="fa fa-check-square-o"></i>Kích hoạt</td>
+                <td>
+                  <button class="btn btn-primary mr-2" *ngIf="_authenService.hasPermission('SYSTEMCONFIG','update')" (click)="editSystemModal(item.Id)"> <i class="fa fa-pencil-square-o"></i></button>
+                  <button class="btn btn-danger" *ngIf="_authenService.hasPermission('SYSTEMCONFIG','delete')" (click)="deleteSystem(item.Id)"> <i class="fa fa-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="systemConfigs && systemConfigs.length == 0" class="col-md-12">
+          <div class="alert alert-info">
+            <strong>Thông báo!</strong> Hiện tại chưa có bài viết nào trong hệ thống
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- this id Model -->
+<div bsModal #addEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Thêm mới / Chỉnh sửa</h4>
+        <button type="button" class="close pull-right" (click)="addEditModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left input_mask" novalidate #addEditForm="ngForm" (ngSubmit)="saveChanges(addEditForm)"
+          *ngIf="entity">
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Tên</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #name="ngModel" [(ngModel)]="entity.Name" required minlength="3" name="name" class="form-control" />
+              <small [hidden]="name.valid || (name.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập tên ít nhất 3 ký tự
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Value 1</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <textarea placeholder="Nhập giá trị là chữ hay số" type="text" #value1="ngModel" [(ngModel)]="entity.Value1"
+                name="value1" class="form-control">
+                </textarea>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Value 2</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input placeholder="Nhập giá trị là số nguyên" type="number" #value2="ngModel" [(ngModel)]="entity.Value2"
+                name="value2" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Value 3</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="checkbox" [(ngModel)]="entity.Value3" name="value3" #status="ngModel"> Kích hoạt
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Value 4</label>
+            <div class="col-md-5 col-sm-10 col-xs-12">
+              <input #dp="bsDatepicker"  [ngModelOptions]="{standalone: true}" bsDatepicker
+                [(ngModel)]="entity.Value4" class="form-control" placeholder="Thời gian">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Value 5</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input placeholder="Nhập giá trị là số bất kỳ" type="number" #value5="ngModel" [(ngModel)]="entity.Value5"
+                name="value5" class="form-control" />
+            </div>
+          </div>
+
+          <div class="ln_solid"></div>
+          <div class="form-group row">
+            <div class="col-md-10 col-sm-10 col-xs-12 col-md-offset-3">
+              <button type="submit" class="btn btn-success  mr-2" [disabled]="!addEditForm.form.valid">Cập nhật</button>
+              <button type="button" (click)="addEditModal.hide()" class="btn btn-danger">Hủy bỏ</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

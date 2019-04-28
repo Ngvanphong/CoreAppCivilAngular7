@@ -1,0 +1,26 @@
+<div class="container-scroller">
+    <!-- partial:../../partials/_navbar.html -->
+    <app-topbar-menu></app-topbar-menu>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+
+      <!-- partial:../../partials/_sidebar.html -->
+      <app-sidebar-menu></app-sidebar-menu>
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+            <router-outlet></router-outlet>
+        </div>
+        <!-- content-wrapper ends -->
+        <!-- partial:../../partials/_footer.html -->
+        <footer class="footer">
+          <div class="container-fluid clearfix">
+            <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © 2019</span>   
+          </div>
+        </footer>
+        <!-- partial -->
+      </div>
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+</div>

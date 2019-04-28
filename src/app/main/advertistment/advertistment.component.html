@@ -1,0 +1,300 @@
+<div class="col-md-12 row">
+  <div class="col-md-9 form-group">
+    <h3>Quản lý Advertistment
+    </h3>
+  </div>
+  <div class="col-md-3 col-sm-6 col-xs-12 form-group ">
+    <input type="text" name="filter" [(ngModel)]="filter" (keyup.enter)="searchIndex()" class="form-control" placeholder="Tìm kiếm...">
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-6 grid-margin stretch-card">
+    <div class="card">
+      <div class="form-group">
+        <button  class="btn btn-success btn-fw" *ngIf="_authenService.hasPermission('ADVERTISMENT','create')" (click)="showAdd()">Thêm mới </button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive" >
+          <table class="table"  *ngIf="advertistments && advertistments.length > 0" >
+            <tr>
+              <th>Tên</th>
+              <th>PageId</th>
+              <th>PositionId</th>            
+              <th>Trạng thái</th>
+              <th>Hình ảnh</th>
+              <th>#</th>
+            </tr>
+            <tbody>
+              <tr *ngFor="let advertistment of advertistments">
+                <td>{{advertistment.Name}}</td>
+                <td>{{advertistment.PageId}}</td>
+                <td>{{advertistment.PositionId}}</td>                           
+                <td *ngIf="advertistment.Status==0"><i class="fa fa-exclamation-triangle"></i>Bị khóa</td>
+                <td *ngIf="advertistment.Status==1"><i class="fa fa-check-square-o"></i>Kích hoạt</td>
+                <td class="py-1">
+                  <img [src]="baseFolder+ advertistment.Image" />
+                </td>
+                <td>
+                  <button class="btn btn-primary mr-2" *ngIf="_authenService.hasPermission('ADVERTISMENT','update')" (click)="editAdvertistmentModal(advertistment.Id)">
+                    <i class="fa fa-pencil-square-o"></i>
+                  </button>
+                  <button  class="btn btn-danger" *ngIf="_authenService.hasPermission('ADVERTISMENT','delete')" (click)="deleteAdvertistment(advertistment.Id)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="row" *ngIf="advertistments && advertistments.length > 0">
+          <div class="col-xs-12 col-12">
+            <pagination [totalItems]="totalRow" [itemsPerPage]="pageSize" [maxSize]="pageDisplay" [(ngModel)]="pageIndex"
+              (pageChanged)="pageChanged($event)"></pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 grid-margin stretch-card">
+    <div class="card">
+      <div class="form-group">
+        <button  class="btn btn-success btn-fw" *ngIf="_authenService.hasPermission('ADVERTISMENT','create')" (click)="showAddPage()">Thêm mới </button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive" >
+          <table class="table"  *ngIf="advertistmentPages && advertistmentPages.length > 0" >
+            <tr>
+              <th>Id</th>
+              <th>Name</th>            
+              <th>#</th>
+            </tr>
+            <tbody>
+              <tr *ngFor="let advertistmentPage of advertistmentPages">
+                <td>{{advertistmentPage.Id}}</td>
+                <td>{{advertistmentPage.Name}}</td>               
+                <td>                
+                  <button  class="btn btn-danger" *ngIf="_authenService.hasPermission('ADVERTISMENT','delete')" (click)="deleteAdvertistmentPage(advertistmentPage.Id)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>      
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 grid-margin stretch-card">
+    <div class="card">
+      <div class="form-group">
+        <button  class="btn btn-success btn-fw" *ngIf="_authenService.hasPermission('ADVERTISMENT','create')" (click)="showAddPosition()">Thêm mới </button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive" >
+          <table class="table"  *ngIf="advertistmentPositions && advertistmentPositions.length > 0" >
+            <tr>
+              <th>Id</th>
+              <th>Name</th>            
+              <th>#</th>
+            </tr>
+            <tbody>
+              <tr *ngFor="let advertistmentPosition of advertistmentPositions">
+                <td>{{advertistmentPosition.Id}}</td>
+                <td>{{advertistmentPosition.Name}}</td>               
+                <td>                
+                  <button  class="btn btn-danger" *ngIf="_authenService.hasPermission('ADVERTISMENT','delete')" (click)="deleteAdvertistmentPosition(advertistmentPosition.Id)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>      
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!--this is a modal advertistment-->
+<div bsModal #modalAddEdit="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Thêm/Sửa Advertistment</h4>
+        <button type="button" class="close pull-right" (click)="modalAddEdit.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left" novalidate #addEditForm="ngForm" (ngSubmit)="saveChange(addEditForm)"
+          *ngIf="entity">
+
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Tên</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #name="ngModel" [(ngModel)]="entity.Name" required minlength="3" name="name" class="form-control">
+              <small [hidden]="name.valid || (name.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập tên ít nhất 3 ký tự
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Nội dung</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #description="ngModel" [(ngModel)]="entity.Description" required name="description" class="form-control">           
+            </div>
+          </div>                                       
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Đường dẫn</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #url="ngModel" [(ngModel)]="entity.Url" required name="url"
+                class="form-control">
+              <small [hidden]="url.valid || (url.pristine && !addEditForm.submitted)" class="text-danger">
+                Bạn phải nhập đường dẫn
+              </small>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Hình ảnh</label>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <input type="file" #image name="image" class="form-control">
+              <p class="help-block label label-danger"> chỉ hỗ trợ định dạng *.png, *.jpg, *.jpeg </p>
+              <input type="hidden" [(ngModel)]="entity.Image" name="imageUrl" />
+            </div>
+            <div class="col-md-2 col-sm-2 col-xs-12" *ngIf="entity.Image">
+              <img [src]="baseFolder + entity.Image" width="90" />
+            </div>
+          </div>        
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Trạng thái</label>
+            <div class="col-md-10 col-sm-10 col-xs-12 ">
+              <label>
+                <input type="checkbox" [(ngModel)]="entity.Status" [name]="Status" name="status" [ngModelOptions]="{standalone: true}"> Kích hoạt
+              </label>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Số thứ tự</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="number" #sortOrder="ngModel" [(ngModel)]="entity.SortOrder" required name="sortOrder" class="form-control">           
+            </div>
+          </div>  
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Trang</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <select required class="form-control" name="page" [(ngModel)]="entity.PageId">               
+                  <option *ngFor="let x of advertistmentPages" [value]="x.Id">{{x.Name}}</option>
+              </select>
+              <input type="hidden" [(ngModel)]="entity.PageId" name="page" class="form-control" />
+            </div>
+          </div> 
+
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Vị trí</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <select required class="form-control" name="position" [(ngModel)]="entity.PositionId">               
+                  <option *ngFor="let x of advertistmentPositions" [value]="x.Id">{{x.Name}}</option>
+              </select>
+              <input type="hidden" [(ngModel)]="entity.PositionId" name="position" class="form-control" />
+            </div>
+          </div> 
+         
+          <div class="ln_solid"></div>
+          <div class="form-group row">
+            <div class="col-md-10 col-sm-10 col-xs-12 col-md-offset-3">
+              <button type="submit" class="btn btn-success mr-2" [disabled]="!addEditForm.form.valid">Cập nhật</button>
+              <button type="button" (click)="modalAddEdit.hide()" class="btn btn-primary">Hủy bỏ</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--this is a modal advertistmentPage-->
+<div bsModal #modalAddEditPage="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Thêm Advertistment Page</h4>
+        <button type="button" class="close pull-right" (click)="modalAddEditPage.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left" novalidate #addEditFormPage="ngForm" (ngSubmit)="saveChangePage(addEditFormPage.valid)"
+          *ngIf="entityPage">       
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Id</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #idPage="ngModel" [(ngModel)]="entityPage.Id" required name="idPage" class="form-control">           
+            </div>
+          </div>    
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Name</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #pageName="ngModel" [(ngModel)]="entityPage.Name" required name="pageName" class="form-control">           
+            </div>
+          </div>                                                           
+          <div class="ln_solid"></div>
+          <div class="form-group row">
+            <div class="col-md-10 col-sm-10 col-xs-12 col-md-offset-3">
+              <button type="submit" class="btn btn-success mr-2" [disabled]="!addEditFormPage.form.valid">Cập nhật</button>
+              <button type="button" (click)="modalAddEditPage.hide()" class="btn btn-primary">Hủy bỏ</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--this is a modal advertistmentPosition-->
+<div bsModal #modalAddEditPosition="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Thêm Advertistment Position</h4>
+        <button type="button" class="close pull-right" (click)="modalAddEditPosition.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left" novalidate #addEditFormPosition="ngForm" (ngSubmit)="saveChangePosition(addEditFormPosition.valid)"
+          *ngIf="entityPage">       
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Id</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #idPosition="ngModel" [(ngModel)]="entityPosition.Id" required name="idPosition" class="form-control">           
+            </div>
+          </div>    
+          <div class="form-group row">
+            <label class="control-label col-md-2 col-sm-2 col-xs-12">Name</label>
+            <div class="col-md-10 col-sm-10 col-xs-12">
+              <input type="text" #positionName="ngModel" [(ngModel)]="entityPosition.Name" required name="positionName" class="form-control">           
+            </div>
+          </div>                                                           
+          <div class="ln_solid"></div>
+          <div class="form-group row">
+            <div class="col-md-10 col-sm-10 col-xs-12 col-md-offset-3">
+              <button type="submit" class="btn btn-success mr-2" [disabled]="!addEditFormPosition.form.valid">Cập nhật</button>
+              <button type="button" (click)="modalAddEditPosition.hide()" class="btn btn-primary">Hủy bỏ</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+

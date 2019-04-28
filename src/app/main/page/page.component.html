@@ -1,0 +1,174 @@
+<div class="col-md-12 row">
+  <h3>Danh sách trang
+  </h3>
+</div>
+<div class="col-md-12 row">
+  <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+    <button class="btn btn-success" *ngIf="_authenService.hasPermission('PAGE','create')" (click)="showAddPage()">Thêm mới</button>
+  </div>
+  <div class="clearfix"></div>
+</div>
+<div class="row">
+  <div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive" *ngIf="pages && pages.length > 0">
+          <table class="table table-striped">
+            <tr>
+              <th>Tên trang</th>
+              <th>Alias</th>
+              <th>Status</th>
+              <th>#</th>
+            </tr>
+            <tbody>
+              <tr *ngFor="let item of pages">
+                <td>{{item.Name}}</td>
+                <td>{{item.Alias}}</td>
+                <td *ngIf="item.Status==0"><i class="fa fa-exclamation-triangle"></i>Không hợp lệ</td>
+                <td *ngIf="item.Status==1"><i class="fa fa-check-square-o"></i>Hợp lệ</td>
+                <td>
+                  <button class="btn btn-primary mr-2" *ngIf="_authenService.hasPermission('PAGE','update')" (click)="showEdit(item.Id)"><i class="fa fa-pencil-square-o"
+                      aria-hidden="true"></i></button>
+                  <button class="btn btn-danger" *ngIf="_authenService.hasPermission('PAGE','delete')" (click)="delete(item.Id)"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Thêm sửa-->
+<div bsModal #addEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Thêm mới / Chỉnh sửa</h4>
+        <button type="button" class="close pull-right" (click)="addEditModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left input_mask" novalidate #addEditForm="ngForm" (ngSubmit)="saveChanges(addEditForm)"
+          *ngIf="entity">
+          <div class="tab-content">
+            <div class="form-group row">
+              <label class="control-label textaligin-right col-md-2 col-sm-2 col-xs-12">Tên</label>
+              <div class="col-md-10 col-sm-10 col-xs-12">
+                <input type="hidden" [(ngModel)]="entity.Id" name="id" />
+                <input type="text" #name="ngModel" (keyup)="createAlias(name.value)" [(ngModel)]="entity.Name" required
+                  minlength="3" name="name" class="form-control" />
+                <small [hidden]="name.valid || (name.pristine && !addEditForm.submitted)" class="text-danger">
+                  Bạn phải nhập tên ít nhất 3 ký tự
+                </small>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="control-label textaligin-right col-md-2 col-sm-2 col-xs-12">Alias</label>
+              <div class="col-md-10 col-sm-10 col-xs-12">
+                <input type="text" #alias="ngModel" [(ngModel)]="entity.Alias" required minlength="3" name="alias"
+                  class="form-control" />
+                <small [hidden]="alias.valid || (alias.pristine && !addEditForm.submitted)" class="text-danger">
+                  Bạn phải nhập alias
+                </small>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="control-label textaligin-right col-md-2 col-sm-2 col-xs-12">Trạng thái</label>
+              <div class="col-md-10 col-sm-10 col-xs-12 row">
+                <div class="checkbox mr-2">
+                  <label>
+                    <input type="checkbox" checked [(ngModel)]="entity.Status" name="status" #status="ngModel"> Kích hoạt
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="control-label textaligin-right col-md-2 col-sm-2 col-xs-12">Chi tiết sản phẩm</label>
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <app-simple-tiny [elementId]="'my-editor-id'" [content]="this.entity.Content" (onEditorKeyup)="keyupHandlerContentFunction($event)">
+                </app-simple-tiny>
+              </div>
+            </div>
+            <div class="form-group" *ngIf="entity.Id">
+              <div class="col-md-12 col-sm-12 col-xs-12 col-md-offset-3">
+                <button type="button" (click)="showImageManageContent(entity.Id)" class="btn btn-primary">Quản lý ảnh cho trang</button>
+              </div>
+            </div>
+          </div>
+          <div class="ln_solid"></div>
+          <div class="form-group">
+            <div class="col-md-12 col-sm-12 col-xs-12 col-md-offset-3">
+              <button type="submit" class="btn btn-success  mr-2" [disabled]="!addEditForm.form.valid">Cập nhật</button>
+              <button type="button" (click)="confirmHideaddEditModal()" class="btn btn-danger">Thoát</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Quản lý ảnh nội dung -->
+<div bsModal #imageManageModalContent="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">Quản lý ảnh cho Page</h4>
+        <button type="button" class="close pull-right" (click)="imageManageModalContent.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal form-label-left input_mask" *ngIf="imageEntityContent" novalidate
+          #imageFormContent="ngForm" (ngSubmit)="savePageImageContent(imageFormContent)">
+          <div class="form-group row">
+            <div class="col-xs-3">
+              <label>Chọn ảnh</label>
+              <input type="file" required #imagePathContent name="imagePathContent" class="form-control">
+              <p class="help-block label label-danger"> chỉ hỗ trợ định dạng *.png, *.jpg, *.jpeg </p>
+              <input type="hidden" [(ngModel)]="imageEntityContent.Path" name="imagePath" />
+              <input type="hidden" [(ngModel)]="imageEntityContent.PageId" name="pageId" />
+            </div>
+            <div class="col-md-4 col-xs-3">
+              <label for="ex2">Mô tả</label>
+              <input class="form-control" name="caption" [(ngModel)]="imageEntityContent.Caption" type="text">
+            </div>
+            <div class="col-xs-3">
+              <button type="submit" class="btn btn-primary mt-27" [disabled]="!imageFormContent.valid">Thêm</button>
+            </div>
+          </div>
+        </form>
+        <table class="table" *ngIf="pageImagesContent && pageImagesContent.length > 0">
+          <thead>
+            <tr>
+              <th>Hình ảnh</th>
+              <th>Đường dẫn</th>             
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let imageContent of pageImagesContent">
+              <td>
+                <img [src]="baseFolder + imageContent.Path" width="100" />
+              </td>
+              <td>
+                {{baseFolder+imageContent.Path}}
+              </td>            
+              <td>
+                <button class="btn btn-danger mr-2" data-toggle="tooltip" data-placement="top" title="Xóa ảnh" (click)="deleteImageContent(imageContent.Id)">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="ln_solid"></div>
+      </div>
+    </div>
+  </div>
+</div>
