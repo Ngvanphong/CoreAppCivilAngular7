@@ -61,13 +61,11 @@ export class ProductComponent implements OnInit {
   }
   public search() {
     this._dataService.get('/api/product/getall?page=' + this.pageIndex + '&pageSize=' + this.pageSize + '&keyword=' + this.filterKeyword + '&categoryId='
-      + this.filterCategoryId + '&filterHotPromotion=' + this.filterHotPromotion)
-      .subscribe((response: any) => {
-        if (response != null) {
-          this.products = response.Items;
-          this.pageIndex = response.PageIndex;
-          this.totalRow = response.TotalRows;
-        }
+      + this.filterCategoryId )
+      .subscribe(res=> {       
+          this.products = res.Items;
+          this.pageIndex = res.PageIndex;
+          this.totalRow = res.TotalRows;      
       }
       );
   }
