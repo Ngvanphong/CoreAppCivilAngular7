@@ -49,10 +49,10 @@ export class ProductComponent implements OnInit {
     private _notificationService: NotificationService, private _uploadService: UploadService,public _authenService:AuthenService) { }
 
   ngOnInit() {
+    setTimeout(()=> this.loadPantner(),500);
+    setTimeout(()=> this.loadProductCategories(),400);
     this.search();
-    this.loadPantner();
-    this.loadProductCategories();
-    
+
   }
 
   pageChanged(event: any): void {
