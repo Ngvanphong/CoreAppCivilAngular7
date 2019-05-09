@@ -44,15 +44,21 @@ export class ProductComponent implements OnInit {
   public imageContent: any = {};
   public pantners:any=[];
 
-
   constructor(private _utilityService: UtilityService, private _dataService: DataService,
     private _notificationService: NotificationService, private _uploadService: UploadService,public _authenService:AuthenService) { }
 
   ngOnInit() {
-    setTimeout(()=> this.loadPantner(),500);
-    setTimeout(()=> this.loadProductCategories(),400);
-    this.search();
+    //this.loadPantner();
+    //this.loadProductCategories();
+    //this.search();  
+    setTimeout(()=>{this.promisefuntion().then(()=>this.loadProductCategories()).then(()=>this.search());},200)
+  }
 
+  private promisefuntion(){
+    return new Promise((resolve, reject)=>{
+        this.loadPantner();
+        resolve();
+    })
   }
 
   pageChanged(event: any): void {
