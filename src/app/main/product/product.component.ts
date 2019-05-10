@@ -182,8 +182,8 @@ export class ProductComponent implements OnInit {
         this._dataService.put('/api/product/update', JSON.stringify(this.entity)).subscribe((response: any) => {
           if (response != null) {
             this.search();
-            this.addEditModal.hide();
-            form.resetForm();
+            //this.addEditModal.hide();
+            //form.resetForm();
           }
         });
       }
